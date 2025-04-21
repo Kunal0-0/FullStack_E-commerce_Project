@@ -11,6 +11,7 @@ const orderRoutes = require("./routes/orderRoutes")
 
 const errorHandler = require("./middlewares/errorHandler")
 
+const cors = require("cors")
 const app = express();
 const PORT = 8000;
 
@@ -46,6 +47,12 @@ app.use("/api/orders", orderRoutes);
 //         message: error.message
 //     })
 // }) 
+
+app.use(cors({
+    origin: "http://localhost:5173", // frontend URL
+    credentials: true,
+}));
+
 app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server Started at PORT: ${PORT}`))

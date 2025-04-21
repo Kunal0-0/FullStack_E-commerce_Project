@@ -23,12 +23,6 @@ router.post("/register", registerUser);
 // Read All Users
 router.get("/", handleGetAllUsers);
 
-router
-  .route("/:id")
-  .get(handleGetUserById) // Read User by ID
-  .put(updateUser) // Update User by ID
-  .delete(deleteUser); // Delete User by ID
-
 // Generate Access and Refresh Tokens
 const generateTokens = (user) => {
   const accessToken = jwt.sign(
@@ -48,17 +42,18 @@ const generateTokens = (user) => {
 router.post("/signup", async (req, res) => {
   try {
     // get all data from body
-    const { mobile_number, name, password, email } = req.body;
+    const { name, email, password } = req.body;
 
     // all the data should exists
-    if (!(mobile_number && name && password && email)) {
-      res.status(400).send("All fields are compulsory");
+    if (!(name && email && password)) {
+      return res.status(400).send("All fields are compulsory");
     }
 
-    // check if user already exists
+    // Check if user already exists by email or mobile
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      res.status(401).send("User already exists with this emails");
+      return res.status(409).send("User already exists with this email or mobile number");
     }
 
     // encrypt the password
@@ -66,13 +61,12 @@ router.post("/signup", async (req, res) => {
 
     // save the user in DB
     const user = await User.create({
-      mobile_number,
       name,
       password: myEncPassword,
       email,
     });
 
-    //  generate a token for user and send it
+    // generate a token for user and send it
     const { accessToken, refreshToken } = generateTokens(user);
     user.token = accessToken;
     user.refreshToken = refreshToken;
@@ -82,7 +76,7 @@ router.post("/signup", async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: "strict",
     });
 
@@ -180,5 +174,13 @@ router.post("/refresh", async (req, res) => {
     return res.status(403).send("Invalid or expired refresh token");
   }
 });
+
+router
+  .route("/:id")
+  .get(handleGetUserById) // Read User by ID
+  .put(updateUser) // Update User by ID
+  .delete(deleteUser); // Delete User by ID
+
+
 
 module.exports = router;

@@ -1,33 +1,55 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import axios from "axios";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ''
+    name: "",
+    email: "",
+    password: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted with:', formData);
-
-    setFormData({
-      name: '',
-      email: '',
-      password: ''
-    });
-
-    alert('Account created successfully!');
+  
+    try {
+      const res = await fetch("http://localhost:8000/api/users/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // send cookies like refresh token,
+        mode: "no-cors",
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+  
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Signup failed");
+      }
+  
+      const data = await res.json();
+      console.log("User signed up:", data);
+      alert("Account created successfully!");
+  
+      setFormData({ name: '', email: '', password: '' });
+    } catch (err) {
+      console.error("Signup error:", err.message);
+      alert(err.message);
+    }
   };
 
   return (
@@ -65,7 +87,7 @@ const SignUp = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Email or Phone Number"
+                placeholder="Email"
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500"
                 required
               />
@@ -96,7 +118,7 @@ const SignUp = () => {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              Already have account?{' '}
+              Already have account?{" "}
               <Link to="/login" className="text-blue-600 font-semibold">
                 Log in
               </Link>

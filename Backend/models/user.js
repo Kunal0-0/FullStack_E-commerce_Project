@@ -1,11 +1,15 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  mobile_number: {
-    type: String,
-    required: [true, "Mobile number is required"],
-    unique: true,
-  },
+  // contact: {
+  //   type: String,
+  //   required: [true, "Mobile number or email is required"],
+  //   unique: true
+  // },
+  // mobile_number: {
+  //   type: String,
+  //   required: [true, "Mobile number is required"],
+  // },
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -14,7 +18,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Password is required"],
   },
-  addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address", required: true }],
+  addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
   // validation_key: {
   //     type: String,
   //     required: [true]

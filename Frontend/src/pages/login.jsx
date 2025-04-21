@@ -16,12 +16,12 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Demo: Just check both fields are filled
+    // Just check both fields are filled
     if (!formData.email || !formData.password) {
       setError('Both fields are required');
       return;
     }
-    // Normally: authenticate with backend here
+    // authenticate with backend here
     alert('Login successful!');
   };
 

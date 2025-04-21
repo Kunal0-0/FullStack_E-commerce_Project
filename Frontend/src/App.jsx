@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import SignUp from './pages/signUp';
 import Login from './pages/login';
+import Footer from './components/footer'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route path='/login' element={<Login />} />
           </Routes>
         </main>
+        <Footer />
       </div>
     </Router>
   );
