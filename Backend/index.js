@@ -17,6 +17,11 @@ const PORT = 8000;
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(cors({
+    origin: "http://localhost:5173", // frontend URL
+    credentials: true,
+}));
+app.options("*", cors());
 
 mongoose.connect("mongodb://127.0.0.1:27017/crud_api")
     .then(() => console.log("DB Connected"))
@@ -47,11 +52,6 @@ app.use("/api/orders", orderRoutes);
 //         message: error.message
 //     })
 // }) 
-
-app.use(cors({
-    origin: "http://localhost:5173", // frontend URL
-    credentials: true,
-}));
 
 app.use(errorHandler);
 

@@ -28,7 +28,6 @@ const SignUp = () => {
           "Content-Type": "application/json",
         },
         credentials: "include", // send cookies like refresh token,
-        mode: "no-cors",
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
