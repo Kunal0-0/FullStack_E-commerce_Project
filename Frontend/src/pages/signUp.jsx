@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import axios from "axios";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({

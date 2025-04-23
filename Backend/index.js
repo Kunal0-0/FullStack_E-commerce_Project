@@ -23,7 +23,7 @@ app.use(cors({
 }));
 app.options("*", cors());
 
-mongoose.connect("mongodb://127.0.0.1:27017/crud_api")
+mongoose.connect("mongodb+srv://kunalu1000:Prohulksniper123@cluster0.7qlasuz.mongodb.net/crud_api")
     .then(() => console.log("DB Connected"))
     .catch(err => console.error(err));
 
