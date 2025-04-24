@@ -1,5 +1,9 @@
 const express = require("express")
 const mongoose = require("mongoose");
+require('dotenv').config();
+
+// Access the environment variable
+const mongoURI = process.env.MONGODB_URI;
 
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -23,9 +27,12 @@ app.use(cors({
 }));
 app.options("*", cors());
 
-mongoose.connect("mongodb+srv://kunalu1000:Prohulksniper123@cluster0.7qlasuz.mongodb.net/crud_api")
-    .then(() => console.log("DB Connected"))
-    .catch(err => console.error(err));
+mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => console.log("DB Connected"))
+.catch(err => console.error(err));
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
