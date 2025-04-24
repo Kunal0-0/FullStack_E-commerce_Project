@@ -27,10 +27,7 @@ app.use(cors({
 }));
 app.options("*", cors());
 
-mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
+mongoose.connect(mongoURI)
 .then(() => console.log("DB Connected"))
 .catch(err => console.error(err));
 
