@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import PhoneOtpForm from '../components/otp-login';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ const Login = () => {
     setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Just check both fields are filled
     if (!formData.email || !formData.password) {
@@ -22,7 +23,39 @@ const Login = () => {
       return;
     }
     // authenticate with backend here
-    alert('Login successful!');
+    try {
+      const res = await fetch("http://localhost:8000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // send cookies like refresh token,
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+  
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Login failed");
+      }
+  
+      const data = await res.json();
+      console.log("User Logged in:", data);
+      alert("Account logged in successfully!");
+  
+      setFormData({ email: '', password: '' });
+    } catch (err) {
+      console.error("Login error:", err.message);
+      alert(err.message);
+    }
+  };
+
+  const [showPhoneOtp, setShowPhoneOtp] = useState(false);
+
+  const handlePhoneLoginClick = () => {
+    setShowPhoneOtp(true);
   };
 
   return (
@@ -40,12 +73,13 @@ const Login = () => {
         <div className="w-full max-w-md">
           <h1 className="text-2xl font-bold mb-6">Log in to Exclusive</h1>
           <p className="text-gray-600 mb-8">Enter your details below</p>
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          {!showPhoneOtp ? (
+            <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <input
                 type="email"
                 name="email"
-                placeholder="Email or Phone Number"
+                placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500"
@@ -71,9 +105,19 @@ const Login = () => {
               >
                 Log In
               </button>
+              <button
+                type='button'
+                onClick={handlePhoneLoginClick}
+                className="px-8 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded transition-colors"
+              >
+                Log In with Number
+              </button>
               <Link to="#" className="text-red-500 hover:underline text-sm">Forget Password?</Link>
             </div>
           </form>
+          ) : (
+            <PhoneOtpForm />
+          )}
         </div>
       </div>
     </div>

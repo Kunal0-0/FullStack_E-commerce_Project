@@ -42,10 +42,10 @@ const generateTokens = (user) => {
 router.post("/signup", async (req, res) => {
   try {
     // get all data from body
-    const { name, email, password } = req.body;
+    const { name, email, mobile_number, password } = req.body;
 
     // all the data should exists
-    if (!(name && email && password)) {
+    if (!(name && email && mobile_number && password)) {
       return res.status(400).send("All fields are compulsory");
     }
 
@@ -53,7 +53,9 @@ router.post("/signup", async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(409).send("User already exists with this email or mobile number");
+      return res
+        .status(409)
+        .send("User already exists with this email or mobile number");
     }
 
     // encrypt the password
@@ -63,6 +65,7 @@ router.post("/signup", async (req, res) => {
     const user = await User.create({
       name,
       password: myEncPassword,
+      mobile_number,
       email,
     });
 
@@ -103,8 +106,15 @@ router.post("/login", async (req, res) => {
     // If invalid credentials
     // match the password
     // await bcrypt.compare(password, user.password) // returns a boolean value
-    if (!user && !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).send("Invalid Credenials");
+    // 1. Check if user exists
+    if (!user) {
+      return res.status(401).send("Invalid credentials");
+    }
+
+    // 2. Check if password matchess
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).send("Invalid credentials");
     }
 
     // if(user && (await bcrypt.compare(password, user.password))) {
@@ -180,7 +190,5 @@ router
   .get(handleGetUserById) // Read User by ID
   .put(updateUser) // Update User by ID
   .delete(deleteUser); // Delete User by ID
-
-
 
 module.exports = router;

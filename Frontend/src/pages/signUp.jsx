@@ -6,6 +6,7 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    mobile_number: "",
     password: "",
   });
 
@@ -30,6 +31,7 @@ const SignUp = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          mobile_number: formData.mobile_number,
           password: formData.password,
         }),
       });
@@ -43,7 +45,7 @@ const SignUp = () => {
       console.log("User signed up:", data);
       alert("Account created successfully!");
   
-      setFormData({ name: '', email: '', password: '' });
+      setFormData({ name: '', email: '', mobile_number: '', password: '' });
     } catch (err) {
       console.error("Signup error:", err.message);
       alert(err.message);
@@ -86,6 +88,17 @@ const SignUp = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="tel"
+                name="mobile_number"
+                value={formData.mobile_number}
+                onChange={handleChange}
+                placeholder="Mobile Number"
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500"
                 required
               />
