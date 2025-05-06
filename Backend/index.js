@@ -11,7 +11,8 @@ const cartRoutes = require("./routes/cartRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
-const orderRoutes = require("./routes/orderRoutes")
+const orderRoutes = require("./routes/orderRoutes");
+const otpRoutes = require("./routes/otpRoutes")
 
 const errorHandler = require("./middlewares/errorHandler")
 
@@ -38,6 +39,7 @@ app.use("/api/address", addressRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/otp", otpRoutes);
 
 // if any unknown route is being accessed
 // app.all('*', (req, res, next) => {

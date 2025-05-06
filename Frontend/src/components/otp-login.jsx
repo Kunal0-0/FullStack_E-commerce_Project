@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Form } from "react-router-dom";
 import OtpInput from "./otp-input";
 
 const PhoneOtpForm = () => {
@@ -10,7 +9,7 @@ const PhoneOtpForm = () => {
     setPhoneNumber(event.target.value)
   }
 
-  const handlePhoneSubmit = (event) => {
+  const handlePhoneSubmit = async (event) => {
     event.preventDefault();
 
     // phone validations
@@ -21,8 +20,24 @@ const PhoneOtpForm = () => {
     }
 
     // call backend API
-    // show OTP Field
-    setShowOtpInput(true)
+    try {
+      const res = await fetch("http://localhost:8000/api/otp/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phoneNumber }),
+      });
+  
+      const data = await res.json();
+      if (res.ok) {
+        setShowOtpInput(true);
+      } else {
+        alert(data.message || "Failed to send OTP");
+      }
+    } catch (error) {
+      alert("Network error");
+    }
   }
 
   const onOtpSubmit = (otp) => {
@@ -31,15 +46,16 @@ const PhoneOtpForm = () => {
   return (
     <div>
       {!showOtpInput ? (
-        <Form onSubmit={handlePhoneSubmit}>
+        <form onSubmit={handlePhoneSubmit}>
         <input 
         type="text" 
         value={phoneNumber}
         onChange={handlePhoneNumber}
         placeholder="Enter Phone Number"
+        className="border border-gray-400 rounded focus:outline-none focus:border-black-500 mr-2 px-2"
         />
-        <button type="submit">Submit</button>
-      </Form>) : (
+        <button type="submit" className="border border-gray-400 rounded focus:outline-none focus:border-black bg-red-500 px-2">Submit</button>
+      </form>) : (
         <div>
           <p> Enter OTP sent to {phoneNumber}</p>
           <OtpInput length={4} onOtpSubmit={onOtpSubmit}/>
