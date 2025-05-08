@@ -26,7 +26,8 @@ const PhoneOtpForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ phoneNumber }),
+        credentials: "include",
+        body: JSON.stringify({ mobile_number: phoneNumber }),
       });
   
       const data = await res.json();
