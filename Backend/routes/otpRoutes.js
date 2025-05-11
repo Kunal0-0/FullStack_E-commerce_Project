@@ -1,11 +1,15 @@
 const express = require("express");
 const router = express.Router();
-
-
 const {
-  checkUser
+  checkUser,
+  sendOtp,
+  verifyOtp
 } = require('../controllers/otp')
 
-router.post("/send", checkUser);
+// Send OTP
+router.post("/send", checkUser, sendOtp);
+
+// Verify OTP
+router.post("/verify", verifyOtp);
 
 module.exports = router;

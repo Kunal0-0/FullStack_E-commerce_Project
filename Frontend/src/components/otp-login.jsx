@@ -13,11 +13,11 @@ const PhoneOtpForm = () => {
     event.preventDefault();
 
     // phone validations
-    const regex = /[^0-9]/g;
-    if(phoneNumber.length < 10 || regex.test(phoneNumber)) {
-      alert("Invalid Phone Number");
-      return;
-    }
+    // const regex = /[^0-9]/g;
+    // if(phoneNumber.length < 10 || regex.test(phoneNumber)) {
+    //   alert("Invalid Phone Number");
+    //   return;
+    // }
 
     // call backend API
     try {
