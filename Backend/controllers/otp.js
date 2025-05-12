@@ -1,72 +1,75 @@
 const User = require("../models/user");
 const Otp = require("../models/Otp");
+const otpGenerator = require("otp-generator");
+
 const dotenv = require("dotenv");
-const twilio = require("twilio");
 
 dotenv.config();
-
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN,
-  process.env.TWILIO_PHONE_NUMBER,
-  {logLevel: 'debug'}
-)
 
 function generateOtp() {
   return Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit OTP
 }
 
 // Verifying whether there is a user with the number entered
-async function checkUser(req, res, next) {
-  const { mobile_number } = req.body;
+// async function checkUser(req, res, next) {
+//   const { mobile_number } = req.body;
 
-  const user = await User.findOne({ mobile_number });
-  if (!user) {
-    const error = new Error("Please enter a registered number");
-    error.statusCode = 404;
-    return next(error);
-  }
-
-  res.status(200).json({ status: true, message: "User exists" });
-}
+// }
 
 async function sendOtp(req, res, next) {
-  const { mobile_number } = req.body;
+  const { email } = req.body;
 
-  const otp = generateOtp();
+  // Check if user is already present
+  const checkUserPresent = await User.findOne({ email });
+  // If user not found with provided email
+  // if (!checkUserPresent) {
+  //   const error = new Error("Please enter a registered email");
+  //   error.statusCode = 404;
+  //   return next(error);
+  // }
+  // If user found with provided email
+  // if (checkUserPresent) {
+  //   const err = new Error("User is already registered");
+  //   err.statusCode = 401;
+  //   return next(err);
+  // }
 
-  // Delete existing OTPs for the number
-  await Otp.deleteMany({ mobile_number });
-
-  // Save new OTP
-  await Otp.create({ mobile_number, otp });
-
-  // Send via Twilio
-  await client.messages.create({
-    body: `Your OTP is: ${otp}`,
-    from: process.env.TWILIO_PHONE_NUMBER,
-    to: `+91${mobile_number}`,
+  let otp = otpGenerator.generate(4, {
+    upperCaseAlphabets: false,
+    lowerCaseAlphabets: false,
+    specialChars: false,
   });
-
-  res.status(200).json({ message: "OTP sent successfully" });
-}
+  let result = await Otp.findOne({ otp: otp });
+  while (result) {
+    otp = otpGenerator.generate(4, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+    result = await Otp.findOne({ otp: otp });
+  }
+  const otpPayLoad = { email, otp };
+  await Otp.create(otpPayLoad);
+  res.status(200).json({
+    success: true,
+    message: "OTP sent successfully",
+  });
+};
 
 async function verifyOtp(req, res, next) {
   const { otp } = req.body;
 
   const existingOtp = await Otp.findOne({ otp });
-  if(!existingOtp) {
+  if (!existingOtp) {
     const error = new Error("Invalid or expired OTP");
     error.statusCode = 400;
     return next(error);
   }
 
   res.status(200).json({ message: "OTP verified successfully" });
-
 }
 
 module.exports = {
-  checkUser,
   sendOtp,
-  verifyOtp
+  verifyOtp,
 };

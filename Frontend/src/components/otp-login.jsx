@@ -21,7 +21,7 @@ const PhoneOtpForm = () => {
 
     // call backend API
     try {
-      const res = await fetch("http://localhost:8000/api/otp/send", {
+      const res = await fetch("http://localhost:8000/api/otp/send-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ const PhoneOtpForm = () => {
         type="text" 
         value={phoneNumber}
         onChange={handlePhoneNumber}
-        placeholder="Enter Phone Number"
+        placeholder="Enter email or Number"
         className="border border-gray-400 rounded focus:outline-none focus:border-black-500 mr-2 px-2"
         />
         <button type="submit" className="border border-gray-400 rounded focus:outline-none focus:border-black bg-red-500 px-2">Submit</button>
