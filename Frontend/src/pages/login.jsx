@@ -110,7 +110,7 @@ const Login = () => {
                 onClick={handlePhoneLoginClick}
                 className="px-8 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded transition-colors"
               >
-                Log In with Number
+                Log In with OTP
               </button>
               <Link to="#" className="text-red-500 hover:underline text-sm">Forget Password?</Link>
             </div>

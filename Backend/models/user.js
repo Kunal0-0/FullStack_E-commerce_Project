@@ -8,7 +8,6 @@ const userSchema = new mongoose.Schema({
   // },
   mobile_number: {
     type: String,
-    required: [true, "Mobile number is required"],
   },
   name: {
     type: String,
