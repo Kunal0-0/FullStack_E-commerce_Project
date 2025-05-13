@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-const OtpInput = ({ length = 4, onOtpSubmit = () => { } }) => {
+const OtpInput = ({ length = 4, onOtpSubmit = () => {} }) => {
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
 
@@ -9,7 +9,7 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => { } }) => {
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus(); // this will focus on the very first field of the input field after entering the phone number
     }
-  }, [])
+  }, []);
 
   console.log(inputRefs);
 
@@ -55,7 +55,8 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => { } }) => {
 
   const navigate = useNavigate();
 
-  const handleLogin = async() => {
+  const handleLogin = async () => {
+    const email = localStorage.getItem("userEmail");
     // call backend API
     try {
       const res = await fetch("http://localhost:8000/api/otp/verify", {
@@ -64,20 +65,20 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => { } }) => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ otp }),
+        body: JSON.stringify({ email: email, otp: otp }),
       });
-  
+
       const data = await res.json();
-      if(res.ok) {
+      if (res.ok) {
         alert("OTP verified successfully");
-        navigate('/');
+        navigate("/");
       } else {
-        alert(data.message || "OTP verification failed")
+        alert(data.message || "OTP verification failed");
       }
     } catch (error) {
       alert("Network error");
     }
-  }
+  };
 
   return (
     <>
@@ -98,7 +99,13 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => { } }) => {
         })}
       </div>
 
-      <button type="button" onClick={handleLogin} className="border border-gray-400 rounded focus:outline-none focus:border-black bg-red-500 px-2">Login</button>
+      <button
+        type="button"
+        onClick={handleLogin}
+        className="border border-gray-400 rounded focus:outline-none focus:border-black bg-red-500 px-2"
+      >
+        Login
+      </button>
     </>
   );
 };
