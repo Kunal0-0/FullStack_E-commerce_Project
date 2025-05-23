@@ -1,6 +1,9 @@
-const User = require("../models/user");
-const Otp = require("../models/otp");
-const otpGenerator = require("otp-generator");
+const {
+  generateUniqueOtp,
+  isUserRegistered,
+  saveOtp,
+  verifyOtpCode
+} = require("../services/otpService")
 
 const dotenv = require("dotenv");
 
@@ -20,7 +23,7 @@ async function sendOtp(req, res, next) {
   const { email } = req.body;
 
   // Check if user is already present
-  const checkUserPresent = await User.findOne({ email });
+  const checkUserPresent = await isUserRegistered({ email });
   // If user not found with provided email
   if (!checkUserPresent) {
     const error = new Error("Please enter a registered email");
@@ -28,22 +31,9 @@ async function sendOtp(req, res, next) {
     return next(error);
   }
 
-  let otp = otpGenerator.generate(4, {
-    upperCaseAlphabets: false,
-    lowerCaseAlphabets: false,
-    specialChars: false,
-  });
-  let result = await Otp.findOne({ email, otp });
-  while (result) {
-    otp = otpGenerator.generate(4, {
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
-      specialChars: false,
-    });
-    result = await Otp.findOne({ email, otp });
-  }
+  const otp = await generateUniqueOtp(email);
+  await saveOtp(email, otp);
 
-  await Otp.create({ email, otp });
   res.status(200).json({
     success: true,
     message: "OTP sent successfully",
@@ -64,7 +54,7 @@ async function verifyOtp(req, res, next) {
     otp = otp.join("");
   }
 
-  const existingOtp = await Otp.findOne({ email, otp });
+  const existingOtp = await verifyOtpCode({ email, otp });
 
   if (!existingOtp) {
     const error = new Error("Invalid or expired OTP");
