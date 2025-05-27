@@ -1,4 +1,9 @@
-const Category = require("../models/category");
+const {
+  createNewCategory,
+  getCategories,
+  updateCategoryById,
+  deleteCategoryById,
+} = require("../services/categoryService");
 
 // create a new category
 async function createCategory(req, res, next) {
@@ -9,8 +14,8 @@ async function createCategory(req, res, next) {
     error.statusCode = 400;
     return next(error);
   }
-  const category = new Category({ name, description });
-  await category.save();
+  const category = await createNewCategory({ name, description });
+
   res
     .status(201)
     .json({ success: true, message: "Category created", category });
@@ -18,18 +23,15 @@ async function createCategory(req, res, next) {
 
 // Get all categories
 async function getAllCategories(req, res, next) {
-  const category = await Category.find();
+  const category = await getCategories();
   res.status(200).json(category);
 }
 
 // Update category
 async function updateCategory(req, res, next) {
-  const updatedCategory = await Category.findByIdAndUpdate(
+  const updatedCategory = await updateCategoryById(
     req.params.categoryId,
     req.body,
-    {
-      new: true,
-    }
   );
   if (!updatedCategory) {
     const error = new Error("Category not found");
@@ -43,7 +45,9 @@ async function updateCategory(req, res, next) {
 
 // Delete a category
 async function deleteCategory(req, res, next) {
-  const deletedCategory = await Category.findByIdAndDelete(req.params.categoryId);
+  const deletedCategory = await deleteCategoryById(
+    req.params.categoryId
+  );
   if (!deletedCategory) {
     const error = new Error("Category not found");
     error.statusCode = 404;

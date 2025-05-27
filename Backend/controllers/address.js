@@ -1,4 +1,9 @@
-const Address = require("../models/address");
+const {
+  createAddress,
+  getAddressByUserId,
+  updateAddressById,
+  deleteAddressById
+} = require("../services/addressService")
 
 // Add a new address
 async function addAddress(req, res, next) {
@@ -26,7 +31,7 @@ async function addAddress(req, res, next) {
     error.statusCode = 400;
     return next(error);
   }
-  const address = new Address({
+  const address = await createAddress({
     // userId,
     phone,
     addressLine1,
@@ -35,13 +40,12 @@ async function addAddress(req, res, next) {
     country,
     postalCode,
   });
-  await address.save();
   res.status(201).json({ success: true, message: "Address added", address });
 }
 
 // Get all addresses for a user
 async function getAddress(req, res, next) {
-  const addresses = await Address.findById(req.params.userId);
+  const addresses = await getAddressByUserId(req.params.userId);
   if (!addresses) {
     const error = new Error("Address not found");
     error.statusCode = 404;
@@ -52,12 +56,9 @@ async function getAddress(req, res, next) {
 
 // Update an address
 async function updateAddress(req, res, next) {
-  const updatedAddress = await Address.findByIdAndUpdate(
+  const updatedAddress = await updateAddressById(
     req.params.addressId,
-    req.body,
-    {
-      new: true,
-    }
+    req.body
   );
   if (!updatedAddress) {
     const error = new Error("Address not found");
@@ -71,7 +72,7 @@ async function updateAddress(req, res, next) {
 
 // Delete an address
 async function deleteAddress(req, res, next) {
-  const deletedAddress = await Address.findByIdAndDelete(req.params.addressId);
+  const deletedAddress = await deleteAddressById(req.params.addressId);
   if (!deletedAddress) {
     const error = new Error("Address not found");
     error.statusCode = 404;

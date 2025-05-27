@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const customMiddleware = require("./middlewares/customMiddleware");
 const {
   createProduct,
   handleGetAllProducts,
@@ -9,12 +10,12 @@ const {
 } = require("../controllers/product");
 
 router
-  .route("/")
+  .route("/", customMiddleware)
   .post(createProduct) // Create Product
   .get(handleGetAllProducts); // Read All Products
 
 router
-  .route("/:id")
+  .route("/:id", customMiddleware)
   .get(handleGetProductsById) // Read Product by ID
   .put(updateProduct) // Update Product by ID
   .delete(deleteProduct); // Delete Product by ID

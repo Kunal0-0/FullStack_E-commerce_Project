@@ -4,6 +4,7 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const customMiddleware = require("./middlewares/customMiddleware");
 const {
   registerUser,
   handleGetAllUsers,
@@ -18,10 +19,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Create User (Register)
-router.post("/register", registerUser);
+router.post("/register", customMiddleware, registerUser);
 
 // Read All Users
-router.get("/", handleGetAllUsers);
+router.get("/", customMiddleware, handleGetAllUsers);
 
 // Generate Access and Refresh Tokens
 const generateTokens = (user) => {
@@ -39,7 +40,7 @@ const generateTokens = (user) => {
 };
 
 // signup
-router.post("/signup", async (req, res) => {
+router.post("/signup", customMiddleware, async (req, res) => {
   try {
     // get all data from body
     const { name, email, mobile_number, password } = req.body;
@@ -90,7 +91,7 @@ router.post("/signup", async (req, res) => {
 });
 
 // login
-router.post("/login", async (req, res) => {
+router.post("/login", customMiddleware, async (req, res) => {
   try {
     // get all data from frontend
     const { email, password } = req.body;
@@ -152,7 +153,7 @@ router.post("/login", async (req, res) => {
 });
 
 // token refresh route
-router.post("/refresh", async (req, res) => {
+router.post("/refresh", customMiddleware, async (req, res) => {
   try {
     if (req.cookies?.refreshToken) {
       // Destructuring refreshToken from cookie
