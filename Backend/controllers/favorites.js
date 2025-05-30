@@ -1,54 +1,50 @@
-const Favorites = require("../models/favorites");
-const mongoose = require("mongoose");
+const {
+  addToFavoritesService,
+  getFavoritesService,
+  removeFromFavoritesService,
+} = require("../services/favoriteService");
 
-// addToFavorites
+// Add To Favorites
 async function addToFavorites(req, res, next) {
   const { userId, product } = req.body;
 
+  // Ensure required fields are provided and that 'product' is an array
   if (!userId || !product || !Array.isArray(product)) {
     const error = new Error("User ID and Product ID(s) are required");
     error.statusCode = 400;
     return next(error);
   }
 
-  const productIds = product.map((id) => new mongoose.Types.ObjectId(id));
-  let favorite = await Favorites.findOne({ userId });
+  // Add products to user's favorite list
+  const productIds = await addToFavoritesService(userId, product);
 
-  if (!favorite) {
-    // Create new favorite doc
-    favorite = new Favorites({ userId, products: productIds });
-  } else {
-    // Avoid duplicates
-    const existingProductIds = favorite.products.map(id => id.toString());
-    const newProducts = productIds.filter(
-      (id) => !existingProductIds.includes(id.toString())
-    );
-
-    if (newProducts.length === 0) {
-      const error = new Error("All products already in favorites");
-      error.statusCode = 400;
-      return next(error);
-    }
-
-    favorite.products.push(...newProducts);
+  // If service returns an error, send a 400 Bad Request
+  if (productIds.error) {
+    const error = new Error(productIds.error);
+    error.statusCode = 400;
+    return next(error);
   }
 
-  await favorite.save();
-  res.status(201).json({ message: "Added to favorites", favorite });
+  // Respond with success and the updated favorite list
+  res
+    .status(201)
+    .json({ message: "Added to favorites", favorite: result.favorite });
 }
 
 // Get all Favorites
 async function getFavorites(req, res, next) {
-  const { userId } = req.params;
+  // Fetch favorites by user ID passed in route params
+  const favorite = await getFavoritesService(req.params.userId);
 
-  const favorite = await Favorites.findOne({ userId }).populate("products");
-
+  // Handle the case where the user has no favorite products
   if (!favorite || favorite.products.length === 0) {
-    return res
-      .status(200)
-      .json({ message: "No favorites found", favorites: [] });
+    return res.status(200).json({
+      message: "No favorites found",
+      favorites: [],
+    });
   }
 
+  // Return the list of favorite products
   res.status(200).json(favorite);
 }
 
@@ -56,31 +52,28 @@ async function getFavorites(req, res, next) {
 async function removeFromFavorites(req, res, next) {
   const { userId, product } = req.body;
 
+  // Ensure required data is provided before proceeding
   if (!userId || !product) {
     const error = new Error("User ID and Product ID are required");
     error.statusCode = 400;
     return next(error);
   }
 
-  const favorite = await Favorites.findOne({ userId });
+  // Attempt to remove the specified product from user's favorites
+  const favorite = await removeFromFavoritesService({ userId, product });
 
-  if (!favorite) {
-    const error = new Error("User has no favorite products");
+  // Handle cases where the product or user is not found
+  if (favorite.error) {
+    const error = new Error(favorite.error);
     error.statusCode = 404;
     return next(error);
   }
 
-  // Remove the product from the array
-  favorite.products = favorite.products.filter((id) => id.toString() !== product);
-
-  if (favorite.products.length === 0) {
-    await Favorites.findByIdAndDelete(favorite._id);
-    return res.status(200).json({ message: "All favorite products removed" });
-  }
-
-  await favorite.save();
-  res.status(200).json({ message: "Product removed from favorites", favorite });
-  
+  // Send a success message with updated favorite list
+  res.status(200).json({
+    message: result.message || "Product removed from favorites",
+    favorite: result.favorite,
+  });
 }
 
 module.exports = {

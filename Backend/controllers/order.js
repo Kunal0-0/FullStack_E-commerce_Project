@@ -1,22 +1,25 @@
-const Order = require("../models/order");
+const {
+  createOrderService,
+  getUserOrdersService,
+  getOrderDetailsService,
+  updateOrderStatusService,
+  deleteOrderService,
+} = require("../services/orderService");
 
 // create a new order
 async function createOrder(req, res, next) {
-  const { userId, items, address, paymentStatus,
-    orderStatus,paymentMethod } = req.body;
+  const { userId, items, address, paymentStatus, orderStatus, paymentMethod } =
+    req.body;
 
+  // Validate required fields to avoid processing incomplete data
   if (!userId || !items || !address || !paymentMethod) {
     const error = new Error("All fields are required");
     error.statusCode = 400;
     return next(error);
   }
 
-  const totalAmount = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  const order = new Order({
+  // Call service to create a new order and calculate total amount
+  const { order, totalAmount } = await createOrderService({
     userId,
     items,
     address,
@@ -25,65 +28,66 @@ async function createOrder(req, res, next) {
     paymentMethod,
   });
 
-  await order.save();
-  res.status(201).json({ message: "Order placed successfully", order, totalAmount });
+  // Respond with success message and created order details
+  res
+    .status(201)
+    .json({ message: "Order placed successfully", order, totalAmount });
 }
 
 // get all orders for a user
 async function getUserOrders(req, res, next) {
-  const { userId } = req.params;
-  const orders = await Order.find({ userId }).populate("items.productId");
+  // Fetch all orders associated with a specific user ID
+  const orders = await getUserOrdersService(req.params.userId);
 
+  // Return list of orders even if empty
   res.status(200).json(orders);
 }
 
 // get details of a specific order
 async function getOrderDetails(req, res, next) {
-  const { id } = req.params;
-  const order = await Order.findById(id)
-    .populate("items.productId")
-    .populate("address");
+  // Fetch order by its unique ID
+  const order = await getOrderDetailsService(req.params.id);
 
+  // Handle case where order doesn't exist
   if (!order) {
     const error = new Error("Order not found");
     error.statusCode = 404;
     return next(error);
   }
 
+  // Respond with the found order details
   res.status(200).json(order);
 }
 
 // Update order status
 async function updateOrderStatus(req, res, next) {
-  const { id } = req.params;
-  const { items, orderStatus, paymentStatus } = req.body;
+  // Update order using ID and new status info from request body
+  const updatedOrder = await updateOrderStatusService(req.params.id, req.body);
 
-  const updatedOrder = await Order.findByIdAndUpdate(
-    id,
-    { items, orderStatus, paymentStatus },
-    { new: true }
-  );
-
+  // Return error if the order to be updated doesn't exist
   if (!updatedOrder) {
     const error = new Error("Order not found");
     error.statusCode = 404;
     return next(error);
   }
 
+  // Confirm successful update to client
   res.status(200).json({ message: "Order updated successfully", updatedOrder });
 }
 
 // Delete an order
 async function deleteOrder(req, res, next) {
-  const{ id } = req.params;
-  const deletedOrder = await Order.findByIdAndDelete(id);
+  // Remove order by ID
+  const deletedOrder = await deleteOrderService(req.params.id);
 
-  if(!deletedOrder) {
+  // Handle case where the order to delete doesn't exist
+  if (!deletedOrder) {
     const error = new Error("Order not found");
     error.statusCode = 404;
     return next(error);
   }
 
+  // Confirm deletion
   res.status(200).json({ message: "Order deleted successfully" });
 }
 

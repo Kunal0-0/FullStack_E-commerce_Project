@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const customMiddleware = require("./middlewares/customMiddleware");
+// const customMiddleware = require("./middlewares/customMiddleware");
 const {
   createCart,
   handleGetAllCarts,
@@ -8,16 +8,17 @@ const {
   updateCart,
   deleteCart,
 } = require("../controllers/cart");
+const { catchAsync } = require("../library/GlobalErrorHandler")
 
 router
-  .route("/", customMiddleware)
-  .post(createCart) // Create Cart
-  .get(handleGetAllCarts); // Read All Carts
+  .route("/")
+  .post(catchAsync(createCart)) // Create Cart
+  .get(catchAsync(handleGetAllCarts)); // Read All Carts
 
 router
-  .route("/:user_id", customMiddleware)
-  .get(handleGetCartById) // Read Cart by User ID
-  .put(updateCart) // Update Cart by User ID
-  .delete(deleteCart); // Delete Cart by User IDss
+  .route("/:user_id")
+  .get(catchAsync(handleGetCartById)) // Read Cart by User ID
+  .put(catchAsync(updateCart)) // Update Cart by User ID
+  .delete(catchAsync(deleteCart)); // Delete Cart by User IDss
 
 module.exports = router;
