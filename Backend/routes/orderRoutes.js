@@ -2,16 +2,16 @@ const express = require("express")
 const router = express.Router()
 // const customMiddleware = require("./middlewares/customMiddleware");
 const { createOrder, getUserOrders, getOrderDetails, updateOrderStatus, deleteOrder } = require("../controllers/order")
-const { catchAsync } = require("../library/GlobalErrorHandler")
+// const { catchAsync } = require("../library/GlobalErrorHandler")
 
 // Create a new order
-router.post("/", catchAsync(createOrder));
+router.post("/", (createOrder));
 
 // Get all orders for a specific user
-router.get("/:userId", catchAsync(getUserOrders));
+router.get("/:userId", (getUserOrders));
 
 // Get details of a single order
-router.get("/details/:id", catchAsync(getOrderDetails));
+router.get("/details/:id", (getOrderDetails));
 
 
 router

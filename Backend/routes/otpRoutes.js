@@ -5,12 +5,12 @@ const {
   sendOtp,
   verifyOtp
 } = require('../controllers/otp')
-const { catchAsync } = require("../library/GlobalErrorHandler")
+// const { catchAsync } = require("../library/GlobalErrorHandler")
 
 // Send OTP
-router.post("/send-otp", catchAsync(sendOtp));
+router.post("/send-otp", (sendOtp));
 
 // Verify OTP
-router.post("/verify", catchAsync(verifyOtp));
+router.post("/verify", (verifyOtp));
 
 module.exports = router;

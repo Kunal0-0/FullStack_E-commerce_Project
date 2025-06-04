@@ -12,7 +12,7 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/user");
-const { catchAsync } = require("../library/GlobalErrorHandler")
+// const { catchAsync } = require("../library/GlobalErrorHandler")
 
 const app = express();
 
@@ -20,10 +20,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Create User (Register)
-router.post("/register", catchAsync(registerUser));
+router.post("/register", (registerUser));
 
 // Read All Users
-router.get("/", catchAsync(handleGetAllUsers));
+router.get("/", (handleGetAllUsers));
 
 // Generate Access and Refresh Tokens
 const generateTokens = (user) => {
@@ -41,7 +41,7 @@ const generateTokens = (user) => {
 };
 
 // signup
-router.post("/signup", catchAsync(async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
     // get all data from body
     const { name, email, mobile_number, password } = req.body;
@@ -89,10 +89,10 @@ router.post("/signup", catchAsync(async (req, res) => {
   } catch (error) {
     console.log(error);
   }
-}));
+});
 
 // login
-router.post("/login", catchAsync(async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     // get all data from frontend
     const { email, password } = req.body;
@@ -151,10 +151,10 @@ router.post("/login", catchAsync(async (req, res) => {
   } catch (error) {
     console.log(error);
   }
-}));
+});
 
 // token refresh route
-router.post("/refresh", catchAsync(async (req, res) => {
+router.post("/refresh", async (req, res) => {
   try {
     if (req.cookies?.refreshToken) {
       // Destructuring refreshToken from cookie
@@ -185,12 +185,12 @@ router.post("/refresh", catchAsync(async (req, res) => {
   } catch (error) {
     return res.status(403).send("Invalid or expired refresh token");
   }
-}));
+});
 
 router
   .route("/:id")
-  .get(catchAsync(handleGetUserById)) // Read User by ID
-  .put(catchAsync(updateUser)) // Update User by ID
-  .delete(catchAsync(deleteUser)); // Delete User by ID
+  .get((handleGetUserById)) // Read User by ID
+  .put((updateUser)) // Update User by ID
+  .delete((deleteUser)); // Delete User by ID
 
 module.exports = router;

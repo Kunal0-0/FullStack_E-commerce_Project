@@ -8,10 +8,11 @@ const {
 
 // Create a new cart
 async function createCart(req, res, next) {
-  const { user_id, products } = req.body;
+  const user_id = req.user.id;
+  const { products } = req.body;
 
   // Ensure both user ID and products are provided before proceeding
-  if (!user_id || !Array.isArray(products) || products.length === 0) {
+  if (!Array.isArray(products) || products.length === 0) {
     const error = new Error("User ID and an array of products with qty are required");
     error.statusCode = 400;
     return next(error);

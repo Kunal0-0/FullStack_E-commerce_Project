@@ -1,9 +1,14 @@
 import React from 'react';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/features/authSlice';
 import { Link } from 'react-router-dom';
 import PhoneOtpForm from '../components/otp-login';
 
+
 const Login = () => {
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -43,8 +48,10 @@ const Login = () => {
   
       const data = await res.json();
       console.log("User Logged in:", data);
+      dispatch(setUser(data));
+      console.log("User dispatched:", data);
+
       alert("Account logged in successfully!");
-  
       setFormData({ email: '', password: '' });
     } catch (err) {
       console.error("Login error:", err.message);

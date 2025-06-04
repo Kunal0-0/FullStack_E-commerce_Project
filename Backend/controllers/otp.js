@@ -25,7 +25,7 @@ async function sendOtp(req, res, next) {
   const { email } = req.body;
 
   // Check if user is already present
-  const checkUserPresent = await isUserRegistered({ email });
+  const checkUserPresent = await isUserRegistered(email);
   // Prevent sending OTP to unregistered users for security reasons
   if (!checkUserPresent) {
     const error = new Error("Please enter a registered email");
@@ -61,7 +61,7 @@ async function verifyOtp(req, res, next) {
   }
 
   // Validate the provided OTP against the stored/expected one
-  const existingOtp = await verifyOtpCode({ email, otp });
+  const existingOtp = await verifyOtpCode(email, otp);
 
   // Handle incorrect or expired OTPs with an error
   if (!existingOtp) {
