@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createElement } from 'react';
 
 const authSlice = createSlice({
     name: 'auth',

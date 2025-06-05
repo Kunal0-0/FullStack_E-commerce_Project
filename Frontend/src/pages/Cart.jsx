@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
+import { setUser } from '../redux/features/authSlice';
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import {
   setCart,
-  addProduct,
   removeProduct,
   increaseQty,
   decreaseQty,
@@ -11,9 +11,13 @@ import {
 
 const Cart = () => {
   const dispatch = useDispatch();
+
+  // Get user and cart products from Redux store
+  const auth = useSelector((state) => state.auth.user);
   const { products } = useSelector((state) => state.cart);
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  // Extract userId safely (is user is logged in)
+  const user = auth?.user;
   const userId = user?._id;
 
   // Sync cart from backend on load
@@ -41,7 +45,7 @@ const Cart = () => {
         products: updatedProducts,
       });
     } catch (err) {
-      console.err("Error updating cart:", err.message);
+      console.error("Error updating cart:", err.message);
     }
   };
 
@@ -70,6 +74,9 @@ const Cart = () => {
     updateCartInDB(updated); // backend sync
   };
 
+  console.log("User from Redux:", user);
+  console.log("Extracted userId:", userId);
+
   if (!userId) {
     return (
       <div className="p-8 text-red-500 font-semibold">
@@ -79,9 +86,9 @@ const Cart = () => {
   }
 
   // show empty cart message if no products
-  if (!products.length) {
-    return <div className="p-8 text-gray-600">Your cart is empty</div>;
-  }
+  // if (!products.length) {
+  //   return <div className="p-8 text-gray-600">Your cart is empty</div>;
+  // }
 
   return (
     <div className="p-8">

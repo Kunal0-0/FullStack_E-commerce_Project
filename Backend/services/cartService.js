@@ -12,8 +12,8 @@ async function getAllCarts() {
 }
 
 // Get a cart by user ID
-async function getCartByUserId(userId) {
-  return await Cart.findOne({ user_id: userId }).populate("products").populate(products.product_id);
+async function getCartByUserId({userId}) {
+  return await Cart.findOne({ user_id: userId }).populate("userId").populate("products.product_id");
 }
 
 // Update cart for a specific user

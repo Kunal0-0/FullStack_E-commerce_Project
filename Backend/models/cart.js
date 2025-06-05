@@ -19,9 +19,8 @@ const cartSchema = new mongoose.Schema({
         min: [1, "Quantity must be at least 1"],
         default: 1
       },
-      _id: {type: mongoose.Schema.Types.ObjectId}
     }
   ]
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Cart", cartSchema);

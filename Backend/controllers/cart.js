@@ -47,7 +47,9 @@ async function handleGetAllCarts(req, res) {
 // Get a single user's cart by user ID
 async function handleGetCartById(req, res, next) {
   // Fetch the cart for a specific user
-  const cart = await getCartByUserId(req.params.user_id)
+  const userId = req.params.user_id
+  // const { products } = req.body;
+  const cart = await getCartByUserId({userId})
 
   // If no cart exists, return a 404 error
   if (!cart) {

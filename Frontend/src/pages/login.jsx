@@ -49,7 +49,7 @@ const Login = () => {
       const data = await res.json();
       console.log("User Logged in:", data);
       dispatch(setUser(data));
-      console.log("User dispatched:", data);
+      console.log("User dispatched:", data.user);
 
       alert("Account logged in successfully!");
       setFormData({ email: '', password: '' });
