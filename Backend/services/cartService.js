@@ -12,22 +12,30 @@ async function getAllCarts() {
 }
 
 // Get a cart by user ID
-async function getCartByUserId({userId}) {
-  return await Cart.findOne({ user_id: userId }).populate("userId").populate("products.product_id");
+async function getCartByUserId({ userId }) {
+  return await Cart.findOne({ user_id: userId })
+    .populate("user_id")
+    .populate("products.product_id");
 }
 
 // Update cart for a specific user
 async function updateCartByUserId(userId, products) {
-  return await Cart.findOneAndUpdate(
+  console.log("PUT /cart/:userId", userId);
+  // const cart = await Cart.findOne({ user_id: userId });
+  const cart = await Cart.findOneAndUpdate(
     { user_id: userId },
-    { products },
+    { products: products },
     { new: true }
-  ).populate("user_id").populate("products.product_id")
+  )
+    .populate("user_id")
+    .populate("products.product_id");
+  console.log("Cart found:", cart);
+  return await cart.save();
 }
 
 // Delete cart for a specific user
 async function deleteCartByUserId(userId) {
-  return await Cart.findOneAndDelete({ user_id: userId });
+  return await Cart.findOneAndDelete({ user_id: mongoose.Types.ObjectId(userId) });
 }
 
 module.exports = {

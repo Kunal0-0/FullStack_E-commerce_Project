@@ -1,3 +1,4 @@
+const Cart = require("../models/cart");
 const {
   createNewCart,
   getAllCarts,
@@ -8,22 +9,31 @@ const {
 
 // Create a new cart
 async function createCart(req, res, next) {
+  console.log(req.user);
   const user_id = req.user.id;
   const { products } = req.body;
 
   // Ensure both user ID and products are provided before proceeding
   if (!Array.isArray(products) || products.length === 0) {
-    const error = new Error("User ID and an array of products with qty are required");
+    const error = new Error(
+      "User ID and an array of products with qty are required"
+    );
     error.statusCode = 400;
     return next(error);
   }
 
   // validate each product
-  for(const product of products) {
-    if(!product.product_id || typeof product.qty !== "number" || product.qty < 1) {
-      const error = new Error("Each product must have a valid product_id and qty >= 1")
+  for (const product of products) {
+    if (
+      !product.product_id ||
+      typeof product.qty !== "number" ||
+      product.qty < 1
+    ) {
+      const error = new Error(
+        "Each product must have a valid product_id and qty >= 1"
+      );
       error.statusCode = 400;
-      return next(error)
+      return next(error);
     }
   }
 
@@ -43,13 +53,12 @@ async function handleGetAllCarts(req, res) {
   res.status(200).json(carts);
 }
 
-
 // Get a single user's cart by user ID
 async function handleGetCartById(req, res, next) {
   // Fetch the cart for a specific user
-  const userId = req.params.user_id
+  const userId = req.params.user_id;
   // const { products } = req.body;
-  const cart = await getCartByUserId({userId})
+  const cart = await getCartByUserId({ userId });
 
   // If no cart exists, return a 404 error
   if (!cart) {
@@ -62,30 +71,42 @@ async function handleGetCartById(req, res, next) {
   res.status(200).json(cart);
 }
 
-
 // Update a user's cart
 async function updateCart(req, res, next) {
+  const userId = req.params.user_id;
   const { products } = req.body;
 
-  if(!Array.isArray(products) || products.length === 0){
-    const error = new Error("An array of products with qty is required to update the cart");
+  if (!Array.isArray(products)) {
+    const error = new Error("Products must be an array");
     error.statusCode = 400;
     return next(error);
   }
 
-  for(const product of products) {
-    if(!product.product_id || typeof product.qty !== "number" || product.qty < 1) {
-      const error = new Error("Each product must have a valid product_id and qty >= 1");
+  for (const product of products) {
+    if (
+      !product.product_id ||
+      typeof product.qty !== "number" ||
+      product.qty < 1
+    ) {
+      const error = new Error(
+        "Each product must have a valid product_id and qty >= 1"
+      );
       error.statusCode = 400;
       return next(error);
     }
   }
 
+  console.log("Updating cart for user:", userId);
+  console.log("Products:", products);
+
+  // if (products.length === 0) {
+  //   // If cart is empty, delete the cart document
+  //   await Cart.findOneAndDelete({ user_id: userId });
+  //   return res.json({ message: "Cart cleared" });
+  // }
+
   // Attempt to update the user's cart with new product list
-  const updatedCart = await updateCartByUserId(
-    req.params.user_id,
-    products,
-  );
+  const updatedCart = await updateCartByUserId(req.params.user_id, products);
 
   // If the update fails (no cart found), respond with a 404 error
   if (!updatedCart) {

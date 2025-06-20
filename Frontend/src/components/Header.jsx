@@ -45,7 +45,7 @@ const Header = () => {
           {/* Cart icon only shown if logged in */}
           {user && (
             <Link to="/cart" className="relative">
-              <FaShoppingCart className="text-2xl text-gray-700 bg-red-200" />
+              <FaShoppingCart className="text-2xl text-gray-700" />
             </Link>
           )}
         </div>
